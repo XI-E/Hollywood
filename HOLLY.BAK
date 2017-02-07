@@ -12,6 +12,7 @@
 #define HINT_GUESS 4 // Number of guesses remaining when hint is given
 
 char mname[100];
+char mname2[100]; // mname2 is a case insensitive version of mname
 char mguess[100];
 char guessed[100];
 int num_guess = MAX_GUESS;
@@ -21,7 +22,7 @@ int height, width;
 
 void init();
 void paint();
-void play();
+void play(char);
 void frame();
 void hint();
 
@@ -35,7 +36,7 @@ void main()
 	{
 	   paint();
 
-	   play();
+	   play('\0');
 	}
 }
 
@@ -47,11 +48,12 @@ void init()
 
 	for(int i = 0; i < strlen(mname); i++)
 	{
-		mname[i] = toupper(mname[i]);
+		//mname[i] = toupper(mname[i]);
+		mname2[i] = toupper(mname[i]);
 
-		if(mname[i] >= 'A' && mname[i] <= 'Z')
+		if(mname2[i] >= 'A' && mname2[i] <= 'Z')
 		{
-			switch(mname[i])
+			switch(mname2[i])
 			{
 				case 'A':
 				case 'E':
@@ -269,15 +271,20 @@ void paint()
 	}
 }
 
-void play()
+void play(char a)
 {
 	char inp;
-	do
-	{
-		inp = getch();
-		inp =  toupper(inp);
+	if(a!='\0'){
+		do
+		{
+			inp = getch();
+			inp =  toupper(inp);
+		}
+		while(!(inp >= 'A' && inp <= 'Z'));
 	}
-	while(!(inp >= 'A' && inp <= 'Z'));
+	else{
+		inp = a;
+	}
 
 	int num_match = 0;
 	for(int i = 0; i < strlen(mname); i++)
@@ -362,7 +369,7 @@ void hint(){
 	rand:
 		r = rand() % strlen(mname);
 		if(mguess[r] == '_'){
-			mguess[r] = mname[r];
+			play(mname[r]);
 			hint_given ++;
 			textcolor(WHITE);
 		}

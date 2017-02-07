@@ -17,11 +17,13 @@ char guessed[100];
 int num_guess = MAX_GUESS;
 int status = 0;
 int hint_given = 0;
+int height, width;
 
 void init();
 void paint();
 void play();
 void frame();
+void hint();
 
 void main()
 {
@@ -86,10 +88,15 @@ void paint()
 	frame();
 
 	int size;
+
 	struct text_info info;
 	gettextinfo(&info);
-	int height = ( (int) info.screenheight) - 2;
-	int width = ( (int) info.screenwidth) - 2;
+	// 		$$$ Made these global $$$
+	//int height = ( (int) info.screenheight) - 2;
+	//int width = ( (int) info.screenwidth) - 2;
+
+	height = ( (int) info.screenheight) - 2;
+	width = ( (int) info.screenwidth) - 2;
 
 	gotoxy(2,(height - NUM_LINES)/2);
 
@@ -102,7 +109,7 @@ void paint()
 	}
 	for( ; i < strlen(hol); i++)
 	{
-		char a = hol[i];
+		//char a = hol[i];
 		textcolor(WHITE);
 		cprintf("%c", hol[i]);
 	}
@@ -121,6 +128,10 @@ void paint()
 	size = strlen("Number of guesses remaining: ") + 1;
 	gotoxy( (width - size)/2 + 1, wherey());
 	cout << "Number of guesses remaining: " << num_guess << endl;
+
+	/*
+
+						***** Added new hint function *****
 
 	//Providing a hint
 	if(num_guess == HINT_GUESS && !hint_given)
@@ -153,6 +164,7 @@ void paint()
 		}
 		while(num_swap != 0);
 		////////////////////////
+
 
 		//Extracting the alphabets used in mname
 		int chars_freq[26];
@@ -224,6 +236,11 @@ void paint()
 		getch();
 
 		paint();
+	}
+	*/
+
+	if(num_guess == HINT_GUESS && hint_given == 0){
+		hint();
 	}
 
 
@@ -330,4 +347,26 @@ void frame()
 	{
 		cout << '*';
 	}
+}
+
+void hint(){
+	int r;
+
+	int size = strlen("You are running low on guesses! Take a hint from us");
+	gotoxy((width - size)/2, wherey());
+	textcolor(LIGHTBLUE);
+	cprintf("\nYou are running low on guesses! Take a hint from us\n");
+	time_t t;
+	srand((unsigned) time(&t));
+
+	rand:
+		r = rand() % strlen(mname);
+		if(mguess[r] == '_'){
+			mguess[r] = mname[r];
+			hint_given ++;
+			textcolor(WHITE);
+		}
+		else{
+			goto rand;
+		}
 }

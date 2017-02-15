@@ -100,10 +100,15 @@ void paint()
 	string hol = " HOLLYWOOD";
 
     setColor(LIGHTRED);
-    cout << hol.substr(0,(MAX_GUESS-num_guess));
+    if((MAX_GUESS-num_guess)!=0){
+        cout << hol.substr(0,(MAX_GUESS-num_guess+1));
+    }
+    else{
+        cout << ' ';
+    }
 
     setColor(WHITE);
-    cout << hol.substr((MAX_GUESS-num_guess), hol.length());
+    cout << hol.substr((MAX_GUESS-num_guess+1), hol.length());
 
 	cout << "\n\n";
 
@@ -146,6 +151,7 @@ void paint()
 
 void play()
 {
+    int n = 0, i = 0, j = 0, k = 0, num_match = 0, is_guessed = 0;
 	char inp;
 	do
 	{
@@ -154,44 +160,49 @@ void play()
 	}
 	while(!(inp >= 'A' && inp <= 'z'));
 
-	int num_match = 0;
-	{
-        for(int i = 0; i < strlen(mname); i++)
-        {
-            if((int) inp == mname2[i])
-            {
-                mguess[i] = mname[i];
-                num_match++;
-            }
-        }
+	switch(inp){
+        case 'A':
+        case 'E':
+        case 'I':
+        case 'O':
+        case 'U':
+            goto skipped;
 	}
 
-	int is_guessed = 0;
-	{
-        for(int i = 0; i < strlen(guessed); i++)
+    for(j = 0; j < strlen(mname); j++)
+    {
+        if((int) inp == mname2[j])
         {
-            if((int)inp == guessed[i])
-            {
-                is_guessed = 1;
-                break;
-            }
+            mguess[j] = mname[j];
+            num_match++;
         }
-	}
+    }
+
+	is_guessed = 0;
+
+    for(i = 0; i < strlen(guessed); i++)
+    {
+        if((int)inp == guessed[i])
+        {
+            is_guessed = 1;
+            break;
+        }
+    }
 
 	if(num_match == 0 && !is_guessed)
 	{
 		num_guess--;
 	}
 
-	int n = 0;
-	for(int i = 0; i < strlen(mguess); i++)
-	{
-		if(mguess[i] == '_')
-		{
-			n++;
-			break;
-		}
-	}
+    for(k = 0; k < strlen(mguess); k++)
+    {
+        if(mguess[k] == '_')
+        {
+            n++;
+            break;
+        }
+    }
+
 	if(n == 0)
 	{
 		status = 1;
@@ -199,6 +210,8 @@ void play()
     if(is_guessed==0){
         guessed[strlen(guessed)] = (char) inp;
     }
+    skipped:
+        ;
 }
 
 void frame()

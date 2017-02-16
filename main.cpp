@@ -2,6 +2,8 @@
 #include <string>
 #include <ctype.h>
 #include <cstdlib>
+#include <chrono>
+#include <random>
 #include "rlutil.h"
 
 #define NUM_LINES 5  // Number of lines printed in second screen
@@ -21,9 +23,11 @@ int hint_given = 0;
 
 void init();
 void paint();
-void play();
+void play(char = '\0');
 void frame();
-void prt_cntr(string);
+void hint();
+
+void prt_cntr(string);      // Prints given string to center of screen
 
 int main(void)
 {
@@ -44,6 +48,7 @@ int main(void)
 void init()
 {
 	cls();
+	rlutil::setColor(WHITE);
 	cout << "Enter the name of the movie\n";
 	cin.getline(mname, 100, '\n');
 
@@ -122,10 +127,12 @@ void paint()
 	cout << "\n\n";
 
 	string s = "Number of guesses remaining: ";
-	char ss[17];
-	itoa(num_guess, ss, 10);
-	s = s.append(ss);
+	s = s.append(to_string(num_guess));
 	prt_cntr(s);
+
+	if(num_guess == HINT_GUESS && hint_given == 0){
+		hint();
+	}
 
 	if(status == 1)
 	{
@@ -143,31 +150,37 @@ void paint()
 
 		string s2 = "The correct answer was ";
         s2 = s2.append(string(mname));
-        prt_cntr(s);
+        prt_cntr(s2);
 		getch();
         exit(0);
 	}
 }
 
-void play()
+void play(char a)
 {
     int n = 0, i = 0, j = 0, k = 0, num_match = 0, is_guessed = 0;
-	char inp;
-	do
-	{
-		inp = getch();
-		inp = toupper(inp);
-	}
-	while(!(inp >= 'A' && inp <= 'z'));
+    char inp;
+    if(a=='\0'){
+        do
+        {
+            inp = getch();
+            inp = toupper(inp);
+        }
+        while(!(inp >= 'A' && inp <= 'z'));
 
-	switch(inp){
-        case 'A':
-        case 'E':
-        case 'I':
-        case 'O':
-        case 'U':
-            goto skipped;
-	}
+        switch(inp){
+            case 'A':
+            case 'E':
+            case 'I':
+            case 'O':
+            case 'U':
+                goto skipped;
+        }
+    }
+    else{
+        a = toupper(a);
+        inp = a;
+    }
 
     for(j = 0; j < strlen(mname); j++)
     {
@@ -236,6 +249,32 @@ void frame()
 	{
 		cout << '*';
 	}
+}
+
+void hint(){
+	int r;
+
+	rlutil::setColor(LIGHTBLUE);
+	cout << endl;
+	prt_cntr("You are running low on guesses! Take a hint from us");
+	cout << endl;
+	rlutil::setColor(WHITE);
+
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator (seed);
+
+    std::uniform_int_distribution<int> distribution(0,strlen(mname));
+
+	rand:
+		r = distribution(generator);
+		cout << r;
+		if(mguess[r] == '_'){
+			play(mname[r]);
+			hint_given ++;
+		}
+		else{
+			goto rand;
+		}
 }
 
 void prt_cntr(string str){

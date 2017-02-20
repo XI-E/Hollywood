@@ -14,19 +14,19 @@
 using namespace std;
 using namespace rlutil;
 
-char mname[100];
-char mname2[100];
-char mguess[100];
-char guessed[100];
-int num_guess = MAX_GUESS;
+char mname[100];            // Stores actual name of movie
+char mname2[100];           // Stores UPPERCASE version of movie name, to validate answers against
+char mguess[100];           // Stores currently guessed movie name; Non-guessed characters replaced by '_'
+char guessed[100];          // Stores guessed letters
+int num_guess = MAX_GUESS;  // Number of guesses/lives provided at start
 int status = 0;
 int hint_given = 0;
 
-void init();
-void init_auto();
-void paint();
-void play(char = '\0');
-void frame();
+void init();                // Initializes game via user input
+void init_auto();           // Initializes game via automatic file read
+void paint();               // Re-paints the game UI on call
+void play(char = '\0');     // Takes user input and validates it
+void frame();               // Draws frame around screen on call
 void hint();
 
 void prt_cntr(string);      // Prints given string to center of screen

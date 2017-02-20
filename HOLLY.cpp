@@ -104,6 +104,36 @@ void init()
 
 	mguess[strlen(mname)] = '\0';
 
+	ifstream movie ("movie.txt", ios_base::in);
+
+	bool match_status = false;
+
+	for(int l = 0; l < 9999; ++l){
+        string line_read;
+        getline(movie, line_read);
+        char name[100];
+        strcpy(name, line_read.c_str());
+        name[strlen(line_read.c_str())] = (char) 0;
+        for( int p = 0; name[p]!=(char) 0; p++){
+            name[p] = toupper(name[p]);
+        }
+
+        if(strcmp(mname2, name) == 0){
+            match_status = true;
+        }
+        if(movie.eof()){
+            break;
+        }
+	}
+
+    movie.close();
+
+	if(match_status == false){
+        ofstream movie_file ("movie.txt", ios_base::app);
+        movie_file << string (mname) << '\n';
+        movie_file.close();
+	}
+
 	cout << endl;
     prt_cntr("Press any key to continue");
 	getch();
@@ -115,12 +145,28 @@ void init_auto()
 	cls();
 	rlutil::setColor(WHITE);
 
+	int max_line = 0;
+
 	ifstream movie ("movie.txt", ios_base::in);
+
+	for(int l = 0; l < 9999; ++l){
+        string line_read;
+        getline(movie, line_read);
+
+        if(movie.eof()){
+            break;
+        }
+        else{
+            max_line++;
+        }
+	}
+
+	movie.seekg(0, ios_base::beg);
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator (seed);
 
-    std::uniform_int_distribution<int> distribution(1,217);
+    std::uniform_int_distribution<int> distribution(1,max_line);
 
     int line = distribution(generator);
 
@@ -131,6 +177,8 @@ void init_auto()
     }
 
     strcpy(mname, mov_inp.c_str());
+
+    movie.close();
 
 	for(int i = 0; i < strlen(mname); i++)
 	{

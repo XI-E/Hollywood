@@ -1,4 +1,5 @@
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <ctype.h>
 #include <cstdlib>
@@ -22,6 +23,7 @@ int status = 0;
 int hint_given = 0;
 
 void init();
+void init_auto();
 void paint();
 void play(char = '\0');
 void frame();
@@ -31,9 +33,28 @@ void prt_cntr(string);      // Prints given string to center of screen
 
 int main(void)
 {
-	cls();
+	start:
 
-	init();
+	cls();
+	rlutil::setColor(WHITE);
+
+	cout << "Choose game mode\n\n1. Against COM\n2. Against human\n\nEnter your choice : ";
+	char inp = getch();
+
+	switch (inp){
+    case '1':
+        init_auto();
+        break;
+    case '2':
+        init();
+        break;
+    default:
+        rlutil::setColor(LIGHTRED);
+        cout << "\n\nInvalid Choice!! Please try again!!";
+        getch();
+        goto start;
+	}
+
 
 	while(1)
 	{
@@ -89,6 +110,65 @@ void init()
 	cls();
 }
 
+void init_auto()
+{
+	cls();
+	rlutil::setColor(WHITE);
+
+	ifstream movie ("movie.txt", ios_base::in);
+
+	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::default_random_engine generator (seed);
+
+    std::uniform_int_distribution<int> distribution(1,217);
+
+    int line = distribution(generator);
+
+    string mov_inp;
+
+    for(int q = 0; q < line; ++q){
+        getline(movie, mov_inp);
+    }
+
+    strcpy(mname, mov_inp.c_str());
+
+	for(int i = 0; i < strlen(mname); i++)
+	{
+		mname2[i] = toupper(mname[i]);
+
+		if(isalpha(mname[i]))
+		{
+			switch(mname[i])
+			{
+                case 'A': case 'a':
+				case 'E': case 'e':
+				case 'I': case 'i':
+				case 'O': case 'o':
+				case 'U': case 'u':
+					mguess[i] = mname[i];
+					break;
+				default:
+					mguess[i] = '_';
+			}
+		}
+		else if(mname[i] == ' ')
+		{
+			mguess[i] = '/';
+		}
+		else
+		{
+			mguess[i] = mname[i];
+		}
+	}
+
+	mguess[strlen(mname)] = '\0';
+
+	cout << endl;
+    prt_cntr("Movie chosen! Press any key to continue");
+	getch();
+	cls();
+}
+
 void paint()
 {
 	cls();
@@ -129,10 +209,6 @@ void paint()
 	string s = "Number of guesses remaining: ";
 	s = s.append(to_string(num_guess));
 	prt_cntr(s);
-
-	if(num_guess == HINT_GUESS && hint_given == 0){
-		hint();
-	}
 
 	if(status == 1)
 	{
@@ -205,6 +281,9 @@ void play(char a)
 	if(num_match == 0 && !is_guessed)
 	{
 		num_guess--;
+        if(num_guess == HINT_GUESS && hint_given == 0){
+            hint();
+        }
 	}
 
     for(k = 0; k < strlen(mguess); k++)
@@ -259,6 +338,7 @@ void hint(){
 	prt_cntr("You are running low on guesses! Take a hint from us");
 	cout << endl;
 	rlutil::setColor(WHITE);
+	getch();
 
 	unsigned seed = std::chrono::system_clock::now().time_since_epoch().count();
     std::default_random_engine generator (seed);

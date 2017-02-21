@@ -130,7 +130,7 @@ void init()
 
 	if(match_status == false){
         ofstream movie_file ("movie.txt", ios_base::app);
-        movie_file << string (mname) << '\n';
+        movie_file << '\n' << string (mname);
         movie_file.close();
 	}
 
